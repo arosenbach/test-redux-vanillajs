@@ -1,10 +1,9 @@
-import { combineReducers } from 'redux'
-import todos from './todos'
-import counter from './counter'
-import pinnedApps from './pinnedApps'
+import { combineReducers } from "redux";
+
+import pinnedApps from "./pinnedApps";
+import apps from "./apps";
 
 export default combineReducers({
-  todos,
-  counter,
-  pinnedApps
-})
+  pinnedApps,
+  apps
+});

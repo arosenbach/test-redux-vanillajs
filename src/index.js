@@ -1,50 +1,47 @@
 import "./styles.css";
-import { createStore, applyMiddleware, compose} from 'redux';
-import reducer from './reducers/index';
-import {addTodo, pinApp, unpinApp} from './actions';
-import { logger } from './middlewares'
-
-
+import { createStore, applyMiddleware } from "redux";
+import reducer from "./reducers/index";
+import { pinApp, unpinApp } from "./actions";
+import { logger } from "./middlewares";
 
 const pinnedAppsEl = document.getElementById("pinnedApps");
+const appsEl = document.getElementById("apps");
 const handleChange = () => {
   const state = store.getState();
-  const appIds = state.pinnedApps;
-  const txt = state.text;
-  pinnedAppsEl.innerHTML = appIds;
+  console.dir(state);
+
+  pinnedAppsEl.innerHTML = state.pinnedApps;
+
+  appsEl.innerHTML = "";
+  state.apps.forEach((app) => {
+    const li = document.createElement("LI");
+    const label = document.createElement("LABEL");
+    label.htmlFor = "pinned" + app.id;
+    label.appendChild(
+      document.createTextNode(
+        `${app.name} : ${app.pinned ? "PINNED" : "UNPINNED"}`
+      )
+    );
+    li.appendChild(label);
+    const checkbox = document.createElement("input");
+    checkbox.id = "pinned" + app.id;
+    checkbox.value = app.id;
+    checkbox.type = "checkbox";
+    checkbox.checked = app.pinned;
+    checkbox.addEventListener("change", (event) => {
+      const toggle = event.target.checked ? pinApp : unpinApp;
+      store.dispatch(toggle(parseInt(event.target.value, 10)));
+    });
+    li.appendChild(checkbox);
+    appsEl.appendChild(li);
+  });
 };
 
 const store = createStore(reducer, applyMiddleware(logger));
-console.log('init state',store.getState());
+
+console.log("init state", store.getState());
 
 const unsubscribe = store.subscribe(handleChange);
 
-store.dispatch(addTodo('HELLO'));
+store.dispatch(unpinApp(1));
 // unsubscribe();
-store.dispatch(pinApp(1));
-// unsubscribe();
-store.dispatch(pinApp(2));
-// unsubscribe();
-store.dispatch(unpinApp(3));
-unsubscribe();
-
-function select(state) {
-  return state.pinnedApps;
-}
-
-// let currentValue;
-// function handleChange() {
-//   let previousValue = currentValue;
-//   currentValue = select(store.getState());
-
-//   if (previousValue !== currentValue) {
-//     console.log(
-//       'Some deep nested property changed from',
-//       previousValue,
-//       'to',
-//       currentValue
-//     )
-//   }
-// }
-
-
